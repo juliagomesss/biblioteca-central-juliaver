@@ -4,26 +4,23 @@ from sqlalchemy import and_
 
 def inject_globals():
     unread_notifications = 0
-    unread_requests = 0
+    unread_activities = 0
     if current_user.is_authenticated:
-        # Imports locais evitam ciclos durante a inicialização do Flask.
-        from .models import Notification, NotificationRead, WorkRequest, WorkRequestRead
+        # Importações atualizadas para o novo modelo
+        from .models import Notification, NotificationRead, Activity
         from .extensions import db
+        
         unread_notifications = Notification.query.filter(
             Notification.resolved_at.is_(None),
             ~Notification.reads.any(NotificationRead.user_id == current_user.id),
         ).count()
-        unread_requests = WorkRequest.query.filter(
-            ~WorkRequest.reads.any(
-                and_(WorkRequestRead.user_id == current_user.id,
-                     WorkRequestRead.last_viewed_at >= WorkRequest.updated_at)
-            )
-        ).count()
+        
+        # Conta atividades que não estão concluídas
+        unread_activities = Activity.query.filter(Activity.status != "Concluída").count()
+
     return {
         "now_date": date.today().strftime("%d/%m/%Y"),
         "today": date.today(),
-        "date": date,
-        "timedelta": __import__("datetime").timedelta,
         "unread_notifications_count": unread_notifications,
-        "unread_requests_count": unread_requests,
+        "unread_activities_count": unread_activities,
     }

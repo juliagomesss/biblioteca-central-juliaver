@@ -1,1 +1,53 @@
-{% extends 'base.html' %}{% block heading %}Central de notificações{% endblock %}{% block content %}<div class="page-actions"><div><h2>Central de notificações</h2><p>Alertas são mantidos no histórico e possuem rastreio de leitura e resolução.</p></div></div><div class="panel table-panel"><table class="table align-middle"><thead><tr><th>Alerta</th><th>Prazo</th><th>Criado em</th><th>Leituras</th><th>Status</th><th>Ações</th></tr></thead><tbody>{% for n in rows %}<tr><td><b>{{ n.message }}</b></td><td>{{ n.due_date or '—' }}</td><td>{{ n.created_at.strftime('%d/%m/%Y') }}</td><td>{{ n.reads|length }}</td><td>{{ 'Resolvida por ' ~ n.resolved_by.name if n.resolved_by else 'Pendente' }}</td><td><div class="d-flex gap-2">{% if not n.reads|selectattr('user_id','equalto',current_user.id)|list %}<form method="post" action="{{ url_for('main.notification_read',nid=n.id) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn btn-sm btn-outline-secondary">Marcar lida</button></form>{% endif %}{% if current_user.role == 'admin' %}<form method="post" action="{{ url_for('main.notification_delete',nid=n.id) }}" onsubmit="return confirm('Excluir esta notificação?')"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn btn-sm btn-outline-danger">Excluir</button></form>{% endif %}{% if not n.resolved_at %}<form method="post" action="{{ url_for('main.notification_resolve',nid=n.id) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn btn-sm btn-outline-primary">Resolver</button></form>{% endif %}</div></td></tr>{% else %}<tr><td colspan="6" class="empty">Nenhuma notificação ativa.</td></tr>{% endfor %}</tbody></table></div>{% endblock %}
+{% extends "base.html" %}
+{% block page_title %}Notificações{% endblock %}
+
+{% block content %}
+<div class="panel">
+    <h3>Suas Notificações</h3>
+    
+    <div class="table-responsive mt-3">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Status</th>
+                    <th>Mensagem</th>
+                    <th>Data</th>
+                    <th>Ação</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for n in rows %}
+                <tr class="{% if n.resolved_at %}text-muted{% endif %}">
+                    <td>
+                        {% if n.resolved_at %}
+                            <span class="badge bg-secondary">Lida</span>
+                        {% else %}
+                            <span class="badge bg-primary">Nova</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if n.resolved_at %}<s>{{ n.message }}</s>{% else %}<strong>{{ n.message }}</strong>{% endif %}
+                    </td>
+                    <td>{{ n.created_at.strftime('%d/%m/%Y %H:%M') }}</td>
+                    <td>
+                        {% if not n.resolved_at %}
+                        <form action="{{ url_for('main.notification_read', nid=n.id) }}" method="POST" class="d-inline">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                            <button type="submit" class="btn btn-sm btn-outline-primary">Marcar como lida</button>
+                        </form>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="4" class="text-center text-muted py-4">
+                        <i class="bi bi-bell-slash fs-3 d-block mb-2"></i>
+                        Nenhuma notificação pendente.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

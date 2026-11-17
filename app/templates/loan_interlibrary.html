@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center">
+    <h2>Inter-bibliotecas: Solicitações</h2>
+    <a href="{{ url_for('main.loans_dashboard') }}" class="btn btn-secondary">Voltar</a>
+</div>
+<hr>
+
+<form method="POST">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+    
+    <div class="card mb-4 shadow-sm">
+        <div class="card-header bg-success text-white">Dados da Biblioteca Solicitante</div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6 mb-2">
+                    <label>Biblioteca *</label>
+                    <input type="text" name="requesting_library" class="form-control" required>
+                </div>
+                <div class="col-md-6 mb-2">
+                    <label>Endereço</label>
+                    <input type="text" name="address" class="form-control">
+                </div>
+                <div class="col-md-3 mb-2">
+                    <label>Telefone</label>
+                    <input type="text" name="phone" class="form-control">
+                </div>
+                <div class="col-md-4 mb-2">
+                    <label>Contato</label>
+                    <input type="text" name="contact_person" class="form-control">
+                </div>
+                <div class="col-md-5 mb-2">
+                    <label>E-mail</label>
+                    <input type="email" name="contact_email" class="form-control">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-4 shadow-sm">
+        <div class="card-header bg-dark text-white">Informação do Item</div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6 mb-2">
+                    <label>Referência Bibliográfica *</label>
+                    <input type="text" name="book_reference" class="form-control" required>
+                </div>
+                <div class="col-md-2 mb-2">
+                    <label>Código do Exemplar</label>
+                    <input type="text" name="copy_code" class="form-control">
+                </div>
+                <div class="col-md-2 mb-2">
+                    <label>Valor do Item</label>
+                    <input type="text" name="item_value" class="form-control">
+                </div>
+                <div class="col-md-12 mb-2">
+                    <label>Observações</label>
+                    <input type="text" name="notes" class="form-control">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-success btn-lg">Registrar Solicitação</button>
+</form>
+
+<hr class="my-5">
+<h4>Histórico</h4>
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead class="table-dark">
+            <tr>
+                <th>Data</th>
+                <th>Biblioteca</th>
+                <th>Referência</th>
+                <th>Cód. Exemplar</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in rows %}
+            <tr>
+                <td>{{ row.request_date.strftime('%d/%m/%Y') }}</td>
+                <td>{{ row.requesting_library }}</td>
+                <td>{{ row.book_reference }}</td>
+                <td>{{ row.copy_code }}</td>
+                <td><span class="badge bg-warning text-dark">Pendente de Devolução</span></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

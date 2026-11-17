@@ -1,6 +1,63 @@
-{% extends 'base.html' %}{% block heading %}Visão geral{% endblock %}{% block content %}
-<div class="welcome-row"><div><h2>Bom trabalho, {{ current_user.name.split(' ')[0] }}.</h2><p>Acompanhe o acervo e as atividades da biblioteca em um só lugar.</p></div><a class="btn btn-primary" href="{{ url_for('main.book_new') }}"><i class="bi bi-plus-lg"></i> Novo livro</a></div>
-<div class="stats-grid">{% for label,key,icon in [('Títulos','titles','bi-book'),('Exemplares','copies','bi-collection'),('Disponíveis','available','bi-check-circle'),('Emprestados','loaned','bi-arrow-left-right'),('Em manutenção','maintenance','bi-tools'),('Conservação crítica','poor','bi-exclamation-triangle'),('Atrasos','overdue','bi-clock-history'),('Substituições pendentes','pending_replacements','bi-arrow-repeat')] %}<div class="stat-card"><div class="stat-icon"><i class="bi {{ icon }}"></i></div><span>{{ label }}</span><strong>{{ stats[key] }}</strong></div>{% endfor %}</div>
-<div class="section-grid"><section class="panel"><div class="panel-head"><div><span class="eyebrow">ACOMPANHAMENTO</span><h3>Distribuição por categoria</h3></div></div><div class="chart-list">{% for name,count in categories %}<div class="chart-line"><span>{{ name or 'Sem categoria' }}</span><div class="progress"><div class="progress-bar" style="width:{{ (count / (stats.copies or 1) * 100)|round }}%"></div></div><b>{{ count }}</b></div>{% else %}<p class="muted">Cadastre livros para visualizar os dados.</p>{% endfor %}</div></section>
-<section class="panel"><div class="panel-head"><div><span class="eyebrow">CONSERVAÇÃO</span><h3>Estado do acervo</h3></div></div>{% for name,count in conditions %}<div class="condition-row"><span>{{ name }}</span><b>{{ count }}</b></div>{% else %}<p class="muted">Sem avaliações cadastradas.</p>{% endfor %}<a class="text-link" href="{{ url_for('main.evaluations') }}">Acessar avaliações →</a></section></div>
-<section class="panel mt-4"><div class="panel-head"><div><span class="eyebrow">RASTREABILIDADE</span><h3>Atividades recentes</h3></div><a class="text-link" href="{{ url_for('main.audit_log') }}">Ver histórico →</a></div>{% for log in recent %}<div class="activity-row"><span class="activity-dot"></span><div><b>{{ log.action }}</b><span>{{ log.entity }} #{{ log.entity_id or '—' }} · {{ log.user.name if log.user else 'Sistema' }}</span></div><time>{{ log.created_at.strftime('%d/%m/%Y %H:%M') }}</time></div>{% else %}<p class="muted">Nenhuma atividade registrada.</p>{% endfor %}</section>{% endblock %}
+{% extends "base.html" %}
+{% block page_title %}Visão Geral{% endblock %}
+
+{% block content %}
+<div class="welcome-row">
+    <div>
+        <h2>Bem-vindo(a), {{ current_user.name.split(' ')[0] }}</h2>
+        <p>O sistema está operando em rede local. Registre as movimentações abaixo.</p>
+    </div>
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <span>Atividades Pendentes</span>
+        <strong>{{ stats.activities }}</strong>
+        <div class="stat-icon"><i class="bi bi-list-check"></i></div>
+    </div>
+    <div class="stat-card">
+        <span>Empréstimos Hoje (Alunos)</span>
+        <strong>{{ stats.loans_today }}</strong>
+        <div class="stat-icon text-success"><i class="bi bi-journal-arrow-up"></i></div>
+    </div>
+    <div class="stat-card">
+        <span>Inter-bibliotecas Abertas</span>
+        <strong>{{ stats.interlibs }}</strong>
+        <div class="stat-icon text-warning"><i class="bi bi-building"></i></div>
+    </div>
+    <div class="stat-card">
+        <span>Notificações</span>
+        <strong>{{ stats.notifications }}</strong>
+        <div class="stat-icon text-danger"><i class="bi bi-bell"></i></div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="panel">
+            <h3>Ações Rápidas</h3>
+            <div class="d-grid gap-2 mt-3">
+                <a href="{{ url_for('main.loan_contingency') }}" class="btn btn-outline-primary text-start p-3">
+                    <i class="bi bi-person-badge me-2"></i> Novo Empréstimo (Aluno)
+                </a>
+                <a href="{{ url_for('main.loan_interlibrary') }}" class="btn btn-outline-success text-start p-3">
+                    <i class="bi bi-building me-2"></i> Novo Empréstimo (Inter-bibliotecas)
+                </a>
+                <a href="{{ url_for('main.activities') }}" class="btn btn-outline-secondary text-start p-3">
+                    <i class="bi bi-plus-circle me-2"></i> Cadastrar Atividade
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="panel">
+            <h3>Status do Sistema</h3>
+            <div class="mt-4 text-center">
+                <div class="display-4 text-success mb-2"><i class="bi bi-wifi"></i></div>
+                <h5>Modo Offline/Local Ativo</h5>
+                <p class="text-muted small">O sistema não depende da internet externa para registrar os dados. Sincronize com o Pergamum quando a conexão for restabelecida.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

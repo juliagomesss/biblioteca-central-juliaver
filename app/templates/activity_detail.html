@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block page_title %}Detalhes da Atividade{% endblock %}
+
+{% block content %}
+<div class="mb-3">
+    <a href="{{ url_for('main.activities') }}" class="text-decoration-none"><i class="bi bi-arrow-left"></i> Voltar para Atividades</a>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="panel">
+            <div class="d-flex justify-content-between align-items-start">
+                <h2 class="mb-0">{{ act.title }}</h2>
+                <span class="badge bg-primary fs-6">{{ act.status }}</span>
+            </div>
+            <p class="text-muted mt-2 small">Criado por {{ act.creator.name }} em {{ act.created_at.strftime('%d/%m/%Y às %H:%M') }}</p>
+            <hr>
+            <p style="white-space: pre-wrap;">{{ act.description }}</p>
+        </div>
+
+        <!-- Chat da Atividade -->
+        <div class="panel" id="chat">
+            <h4>Conversa da Equipe</h4>
+            <div class="chat-messages mb-3" style="height: 300px; background: #f8fafc; border-radius: 8px; padding: 15px;">
+                {% for msg in act.messages %}
+                <div class="mb-3 {% if msg.user_id == current_user.id %}text-end{% endif %}">
+                    <small class="text-muted d-block">{{ msg.author.name }} - {{ msg.created_at.strftime('%H:%M') }}</small>
+                    <div class="d-inline-block p-2 rounded {% if msg.user_id == current_user.id %}bg-primary text-white{% else %}bg-white border{% endif %}" style="max-width: 80%;">
+                        {{ msg.body }}
+                    </div>
+                </div>
+                {% else %}
+                <p class="text-muted text-center mt-5">Nenhuma mensagem ainda. Inicie a conversa!</p>
+                {% endfor %}
+            </div>
+            <form method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                <div class="input-group">
+                    <input type="text" name="body" class="form-control" placeholder="Escreva um comentário..." required autocomplete="off">
+                    <button type="submit" class="btn btn-primary">Enviar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Painel Lateral -->
+    <div class="col-md-4">
+        <div class="panel">
+            <h4>Gerenciar Status</h4>
+            <form method="POST" class="mt-3">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                <div class="mb-3">
+                    <label>Alterar Status da Tarefa</label>
+                    <select name="status" class="form-select mb-2">
+                        <option value="Aberta" {% if act.status == 'Aberta' %}selected{% endif %}>Aberta</option>
+                        <option value="Em andamento" {% if act.status == 'Em andamento' %}selected{% endif %}>Em Andamento</option>
+                        <option value="Concluída" {% if act.status == 'Concluída' %}selected{% endif %}>Concluída</option>
+                    </select>
+                    <button type="submit" class="btn btn-success w-100">Atualizar Status</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

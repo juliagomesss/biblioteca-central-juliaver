@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block page_title %}Chat da Equipe{% endblock %}
+
+{% block content %}
+<div class="chat-container">
+    <div class="chat-header">
+        <i class="bi bi-people-fill text-primary me-2"></i> Mural de Conversas
+    </div>
+    
+    <div class="chat-messages" id="chat-box">
+        {% for msg in messages %}
+            <div class="chat-bubble-wrap {% if msg.user_id == current_user.id %}own{% endif %}">
+                <div class="chat-meta">
+                    <strong>{{ msg.author.name }}</strong> • {{ msg.created_at.strftime('%H:%M') }}
+                </div>
+                <div class="chat-bubble">
+                    {{ msg.body }}
+                </div>
+            </div>
+        {% else %}
+            <div class="text-center text-muted mt-5">
+                <i class="bi bi-chat-square-text fs-1"></i>
+                <p class="mt-2">Nenhuma mensagem ainda. Inicie a conversa!</p>
+            </div>
+        {% endfor %}
+    </div>
+
+    <div class="chat-input-area">
+        <form method="POST" class="d-flex gap-2">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+            <input type="text" name="body" class="form-control" placeholder="Digite uma mensagem para a equipe..." autocomplete="off" required>
+            <button type="submit" class="btn btn-primary px-4"><i class="bi bi-send"></i></button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Rola automaticamente para a última mensagem
+    const chatBox = document.getElementById('chat-box');
+    chatBox.scrollTop = chatBox.scrollHeight;
+</script>
+{% endblock %}
