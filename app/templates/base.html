@@ -21,12 +21,15 @@
             
             {% if current_user.is_authenticated %}
                 <div class="user-mini">
-                    <!-- O erro acontecia exatamente aqui -->
                     <div class="avatar">{{ current_user.name[0]|upper }}</div>
-                    <div>
-                        <strong>{{ current_user.name }}</strong>
+                    <div style="flex: 1; min-width: 0;">
+                        <strong class="text-truncate d-block">{{ current_user.name }}</strong>
                         <small>{{ current_user.role|capitalize }}</small>
                     </div>
+                    <!-- BOTÃO DE ALTERAR SENHA AQUI -->
+                    <a href="{{ url_for('main.change_password') }}" class="text-white opacity-50" title="Alterar Senha" style="text-decoration: none;">
+                        <i class="bi bi-key-fill fs-5"></i>
+                    </a>
                 </div>
 
                 <nav>

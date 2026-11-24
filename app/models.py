@@ -18,7 +18,6 @@ class User(UserMixin, db.Model):
     @property
     def is_active(self): return self.active
 
-# --- ÁREA DE ATIVIDADES ---
 class Activity(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(180), nullable=False)
@@ -29,7 +28,6 @@ class Activity(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     creator = db.relationship("User")
 
-# --- CHAT GERAL ---
 class ChatMessage(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
@@ -37,17 +35,19 @@ class ChatMessage(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False, index=True)
     author = db.relationship("User")
 
-# --- EMPRÉSTIMO: CONTINGÊNCIA (Alunos) ---
 class ContingencyLoan(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    # Dados do Cabeçalho (Imagem 2 e Imagem 4 do Pergamum)
-    loan_date = db.Column(db.Date, nullable=False, default=date.today) # Data
-    expected_return_date = db.Column(db.Date) # Devolução prevista
-    user_document = db.Column(db.String(20)) # CPF
-    user_name = db.Column(db.String(140), nullable=False) # Usuário(a) / Nome do patrono
-    user_phone = db.Column(db.String(40)) # TEL/Cel
-    user_registration = db.Column(db.String(60)) # Código Pessoa (Pergamum)
-    notes = db.Column(db.Text) # OBS geral
+    loan_date = db.Column(db.Date, nullable=False, default=date.today)
+    expected_return_date = db.Column(db.Date)
+    user_document = db.Column(db.String(20))
+    user_name = db.Column(db.String(140), nullable=False)
+    user_phone = db.Column(db.String(40))
+    user_registration = db.Column(db.String(60))
+    notes = db.Column(db.Text)
+    
+    # NOVOS CAMPOS
+    returned_at = db.Column(db.DateTime, nullable=True) 
+    status = db.Column(db.String(30), default="Emprestado", nullable=False) # Emprestado, Devolvido, Atrasado
     
     created_by_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
@@ -57,35 +57,37 @@ class ContingencyLoan(db.Model):
 class ContingencyLoanItem(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     loan_id = db.Column(db.Integer, db.ForeignKey("contingency_loan.id"), nullable=False)
-    # Campos de cada livro (Imagem 2)
-    book_title = db.Column(db.String(220), nullable=False) # Livro
-    copy_code = db.Column(db.String(60)) # C.E. (Código do Exemplar)
-    item_notes = db.Column(db.Text) # OBS (do livro)
+    book_title = db.Column(db.String(220), nullable=False)
+    copy_code = db.Column(db.String(60))
+    item_notes = db.Column(db.Text)
 
-# --- EMPRÉSTIMO: INTER-BIBLIOTECAS ---
 class InterLibraryLoan(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    # Colunas da Imagem 1 (Excel)
-    request_date = db.Column(db.Date, nullable=False, default=date.today) # Data Solicitação
-    loan_date = db.Column(db.Date) # Data Empréstimo
-    return_date = db.Column(db.Date) # Data Devolução
+    request_date = db.Column(db.Date, nullable=False, default=date.today)
+    loan_date = db.Column(db.Date)
+    return_date = db.Column(db.Date)
     
-    requesting_library = db.Column(db.String(140), nullable=False) # Biblioteca (Solicitante)
-    address = db.Column(db.String(255)) # Endereço
-    phone = db.Column(db.String(40)) # Telefone
-    contact_person = db.Column(db.String(140)) # Contato
-    contact_email = db.Column(db.String(160)) # E-mail
+    # NOVO CAMPO
+    status = db.Column(db.String(30), default="Pendente", nullable=False) # Pendente, Emprestado, Devolvido
     
-    book_reference = db.Column(db.String(255), nullable=False) # Referência Bibliográfica
-    copy_code = db.Column(db.String(60)) # Código do Exemplar
-    item_value = db.Column(db.String(40)) # Valor do item
-    notes = db.Column(db.Text) # Observações
+    requesting_library = db.Column(db.String(140), nullable=False)
+    address = db.Column(db.String(255))
+    phone = db.Column(db.String(40))
+    contact_person = db.Column(db.String(140))
+    contact_email = db.Column(db.String(160))
+    
+    student_name = db.Column(db.String(140)) 
+    student_registration = db.Column(db.String(60))
+    
+    book_reference = db.Column(db.String(255), nullable=False)
+    copy_code = db.Column(db.String(60))
+    item_value = db.Column(db.String(40))
+    notes = db.Column(db.Text)
     
     created_by_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     operator = db.relationship("User")
 
-# --- NOTIFICAÇÕES E AUDITORIA ---
 class Notification(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     kind = db.Column(db.String(40), nullable=False)

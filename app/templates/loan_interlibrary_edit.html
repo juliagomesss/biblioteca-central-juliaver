@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block page_title %}Editar Inter-bibliotecas{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">Editar Solicitação Inter-bibliotecas</h2>
+
+<form method="POST">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+    <div class="panel mb-4">
+        <h3>Instituição</h3>
+        <div class="row g-3">
+            <div class="col-md-6"><label>Biblioteca *</label><input type="text" name="requesting_library" class="form-control" value="{{ loan.requesting_library }}" required></div>
+            <div class="col-md-6"><label>Endereço</label><input type="text" name="address" class="form-control" value="{{ loan.address or '' }}"></div>
+            <div class="col-md-4"><label>Telefone</label><input type="text" name="phone" class="form-control" value="{{ loan.phone or '' }}"></div>
+            <div class="col-md-4"><label>Contato</label><input type="text" name="contact_person" class="form-control" value="{{ loan.contact_person or '' }}"></div>
+            <div class="col-md-4"><label>E-mail</label><input type="email" name="contact_email" class="form-control" value="{{ loan.contact_email or '' }}"></div>
+        </div>
+    </div>
+
+    <div class="panel mb-4">
+        <h3>Aluno Solicitante</h3>
+        <div class="row g-3">
+            <div class="col-md-8"><label>Nome do Aluno</label><input type="text" name="student_name" class="form-control" value="{{ loan.student_name or '' }}"></div>
+            <div class="col-md-4"><label>Prontuário</label><input type="text" name="student_registration" class="form-control" value="{{ loan.student_registration or '' }}"></div>
+        </div>
+    </div>
+
+    <div class="panel mb-4">
+        <h3>Item</h3>
+        <div class="row g-3">
+            <div class="col-md-6"><label>Referência *</label><input type="text" name="book_reference" class="form-control" value="{{ loan.book_reference }}" required></div>
+            <div class="col-md-3"><label>Cód. Exemplar</label><input type="text" name="copy_code" class="form-control" value="{{ loan.copy_code or '' }}"></div>
+            <div class="col-md-3"><label>Valor</label><input type="text" name="item_value" class="form-control" value="{{ loan.item_value or '' }}"></div>
+            <div class="col-md-12"><label>Observações</label><input type="text" name="notes" class="form-control" value="{{ loan.notes or '' }}"></div>
+        </div>
+    </div>
+
+    <div class="text-end">
+        <a href="{{ url_for('main.loan_interlibrary_detail', id=loan.id) }}" class="btn btn-outline-secondary me-2">Cancelar</a>
+        <button type="submit" class="btn btn-primary px-5">Salvar Alterações</button>
+    </div>
+</form>
+{% endblock %}

@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block page_title %}Detalhes Inter-bibliotecas{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Detalhes da Solicitação</h2>
+    <a href="{{ url_for('main.loan_interlibrary') }}" class="btn btn-outline-secondary">Voltar</a>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="panel">
+            <h3>Instituição Solicitante</h3>
+            <p><strong>Biblioteca:</strong> {{ loan.requesting_library }}</p>
+            <p><strong>Endereço:</strong> {{ loan.address or '-' }}</p>
+            <p><strong>Telefone:</strong> {{ loan.phone or '-' }}</p>
+            <p><strong>Contato:</strong> {{ loan.contact_person or '-' }}</p>
+            <p><strong>E-mail:</strong> {{ loan.contact_email or '-' }}</p>
+            <p><strong>Operador:</strong> {{ loan.operator.name }} em {{ loan.request_date.strftime('%d/%m/%Y') }}</p>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="panel">
+            <h3>Aluno Solicitante</h3>
+            <p><strong>Nome:</strong> {{ loan.student_name or '-' }}</p>
+            <p><strong>Prontuário:</strong> {{ loan.student_registration or '-' }}</p>
+            <hr>
+            <h3>Informações do Item</h3>
+            <p><strong>Referência:</strong> {{ loan.book_reference }}</p>
+            <p><strong>Cód. Exemplar:</strong> {{ loan.copy_code or '-' }}</p>
+            <p><strong>Valor:</strong> {{ loan.item_value or '-' }}</p>
+            <p><strong>Observações:</strong> {{ loan.notes or '-' }}</p>
+        </div>
+    </div>
+</div>
+
+<div class="panel text-end">
+    <a href="{{ url_for('main.loan_interlibrary_pdf', id=loan.id) }}" target="_blank" class="btn btn-danger me-2"><i class="bi bi-file-earmark-pdf"></i> Baixar Recibo</a>
+    <a href="{{ url_for('main.loan_interlibrary_edit', id=loan.id) }}" class="btn btn-primary me-2"><i class="bi bi-pencil"></i> Editar</a>
+    <form action="{{ url_for('main.loan_interlibrary_delete', id=loan.id) }}" method="POST" class="d-inline" onsubmit="return confirm('Excluir esta solicitação?');">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        <button type="submit" class="btn btn-outline-danger"><i class="bi bi-trash"></i> Excluir</button>
+    </form>
+</div>
+{% endblock %}

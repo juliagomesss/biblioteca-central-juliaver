@@ -4,26 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Configuração Inicial - Biblio Offline</title>
-    <!-- Bootstrap e Ícones -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-    <!-- Seu CSS -->
+    
+    <!-- Link do CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
     <div class="login-wrap">
-        <div class="login-card">
+        <div class="login-card text-center">
             <div class="login-mark">
-                <i class="bi bi-shield-lock"></i>
+                <i class="bi bi-shield-lock-fill"></i>
             </div>
-            <span class="text-primary fw-bold" style="font-size: 10px; letter-spacing: 1px;">PRIMEIRO ACESSO</span>
-            <h2>Crie o Administrador</h2>
-            <p>Esta etapa aparece apenas uma vez. Defina os dados do gestor principal do sistema.</p>
+            
+            <span class="badge bg-primary mb-3">PRIMEIRO ACESSO</span>
+            <h2 class="mb-2">Crie o Administrador</h2>
+            <p class="text-muted small mb-4">Esta etapa aparece apenas uma vez.<br>Defina os dados do gestor principal do sistema.</p>
 
             {% with messages = get_flashed_messages(with_categories=true) %}
                 {% if messages %}
                     {% for category, message in messages %}
-                        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        <div class="alert alert-{{ category }} alert-dismissible fade show text-start" role="alert">
                             {{ message }}
                             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                         </div>
@@ -31,25 +32,27 @@
                 {% endif %}
             {% endwith %}
 
-            <form method="POST">
+            <form method="POST" class="text-start">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                 <div class="mb-3">
                     <label>Nome completo</label>
-                    <input type="text" name="name" class="form-control" required autofocus>
+                    <input type="text" name="name" class="form-control" placeholder="Ex: João da Silva" required autofocus>
                 </div>
                 <div class="mb-3">
                     <label>Login de acesso</label>
-                    <input type="text" name="username" class="form-control" required>
+                    <input type="text" name="username" class="form-control" placeholder="Ex: joao.silva" required>
                 </div>
                 <div class="mb-3">
                     <label>E-mail</label>
-                    <input type="email" name="email" class="form-control" required>
+                    <input type="email" name="email" class="form-control" placeholder="joao@instituicao.edu.br" required>
                 </div>
                 <div class="mb-4">
                     <label>Senha (mínimo 10 caracteres)</label>
-                    <input type="password" name="password" class="form-control" required minlength="10">
+                    <input type="password" name="password" class="form-control" placeholder="••••••••••" required minlength="10">
                 </div>
-                <button type="submit" class="btn btn-primary w-100 py-2">Criar Administrador <i class="bi bi-arrow-right"></i></button>
+                <button type="submit" class="btn btn-primary w-100 py-2">
+                    Criar Administrador <i class="bi bi-arrow-right"></i>
+                </button>
             </form>
         </div>
     </div>

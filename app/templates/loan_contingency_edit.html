@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block page_title %}Editar Empréstimo{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">Editar Empréstimo (Aluno)</h2>
+
+<form method="POST">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+    <div class="panel mb-4">
+        <h3>Dados do Solicitante</h3>
+        <div class="row g-3">
+            <div class="col-md-6"><label>Nome *</label><input type="text" name="user_name" class="form-control" value="{{ loan.user_name }}" required></div>
+            <div class="col-md-3"><label>CPF</label><input type="text" name="user_document" class="form-control" value="{{ loan.user_document or '' }}"></div>
+            <div class="col-md-3"><label>Cód. Pessoa</label><input type="text" name="user_registration" class="form-control" value="{{ loan.user_registration or '' }}"></div>
+            <div class="col-md-4"><label>Telefone</label><input type="text" name="user_phone" class="form-control" value="{{ loan.user_phone or '' }}"></div>
+            <div class="col-md-4"><label>Devolução Prevista</label><input type="date" name="expected_return_date" class="form-control" value="{{ loan.expected_return_date.isoformat() if loan.expected_return_date else '' }}"></div>
+            <div class="col-md-4"><label>Observações</label><input type="text" name="notes" class="form-control" value="{{ loan.notes or '' }}"></div>
+        </div>
+    </div>
+
+    <div class="panel mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-3">
+            <h3 class="mb-0 border-0 pb-0">Livros Emprestados</h3>
+            <button type="button" class="btn btn-outline-primary btn-sm" onclick="addBookRow()"><i class="bi bi-plus-lg"></i> Adicionar Livro</button>
+        </div>
+        <div id="books-container">
+            {% for item in loan.items %}
+            <div class="row g-3 book-row align-items-end mt-1">
+                <div class="col-md-6"><input type="text" name="book_title[]" class="form-control" value="{{ item.book_title }}" required></div>
+                <div class="col-md-3"><input type="text" name="copy_code[]" class="form-control" value="{{ item.copy_code or '' }}"></div>
+                <div class="col-md-3">
+                    <div class="d-flex gap-2">
+                        <input type="text" name="item_notes[]" class="form-control" value="{{ item.item_notes or '' }}">
+                        <button type="button" class="btn btn-outline-danger" onclick="this.closest('.book-row').remove()"><i class="bi bi-trash"></i></button>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="text-end">
+        <a href="{{ url_for('main.loan_contingency_detail', id=loan.id) }}" class="btn btn-outline-secondary me-2">Cancelar</a>
+        <button type="submit" class="btn btn-primary px-5">Salvar Alterações</button>
+    </div>
+</form>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function addBookRow() {
+        const container = document.getElementById('books-container');
+        const newRow = document.createElement('div');
+        newRow.className = 'row g-3 book-row align-items-end mt-1';
+        newRow.innerHTML = `
+            <div class="col-md-6"><input type="text" name="book_title[]" class="form-control" required></div>
+            <div class="col-md-3"><input type="text" name="copy_code[]" class="form-control"></div>
+            <div class="col-md-3">
+                <div class="d-flex gap-2">
+                    <input type="text" name="item_notes[]" class="form-control">
+                    <button type="button" class="btn btn-outline-danger" onclick="this.closest('.book-row').remove()"><i class="bi bi-trash"></i></button>
+                </div>
+            </div>
+        `;
+        container.appendChild(newRow);
+    }
+</script>
+{% endblock %}

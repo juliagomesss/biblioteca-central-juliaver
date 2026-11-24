@@ -1,101 +1,125 @@
 {% extends "base.html" %}
+{% block page_title %}Empréstimos{% endblock %}
+
 {% block content %}
-<div class="d-flex justify-content-between align-items-center">
-    <h2>Empréstimo de Contingência (Alunos)</h2>
-    <a href="{{ url_for('main.loans_dashboard') }}" class="btn btn-secondary">Voltar</a>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div><h2 class="mb-0">Novo Empréstimo</h2></div>
+    <a href="{{ url_for('main.loans_dashboard') }}" class="btn btn-outline-secondary">Voltar</a>
 </div>
-<hr>
 
 <form method="POST">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-    
-    <!-- Cabeçalho do Formulário -->
-    <div class="card mb-4 shadow-sm">
-        <div class="card-header bg-dark text-white">Dados do Solicitante</div>
-        <div class="card-body">
-            <div class="row">
-                <div class="col-md-4 mb-2">
-                    <label>Nome do Usuário (a) *</label>
-                    <input type="text" name="user_name" class="form-control" required>
-                </div>
-                <div class="col-md-2 mb-2">
-                    <label>CPF</label>
-                    <input type="text" name="user_document" class="form-control">
-                </div>
-                <div class="col-md-3 mb-2">
-                    <label>Tel / Cel</label>
-                    <input type="text" name="user_phone" class="form-control">
-                </div>
-                <div class="col-md-3 mb-2">
-                    <label>Cód. Pessoa (Pergamum)</label>
-                    <input type="text" name="user_registration" class="form-control">
-                </div>
-                <div class="col-md-4 mb-2">
-                    <label>Devolução Prevista</label>
-                    <input type="date" name="expected_return_date" class="form-control">
-                </div>
-                <div class="col-md-8 mb-2">
-                    <label>Observações Gerais</label>
-                    <input type="text" name="notes" class="form-control">
-                </div>
+    <div class="panel mb-4">
+        <h3>Dados do Solicitante</h3>
+        <div class="row g-3">
+            <div class="col-md-4">
+                <label>Data do Empréstimo *</label>
+                <input type="date" name="loan_date" class="form-control" value="{{ today }}" required>
+            </div>
+            <div class="col-md-8">
+                <label>Nome Completo *</label>
+                <input type="text" name="user_name" class="form-control" placeholder="Nome do aluno ou professor" required>
+            </div>
+            <div class="col-md-3">
+                <label>CPF</label>
+                <input type="text" name="user_document" class="form-control">
+            </div>
+            <div class="col-md-3">
+                <label>Cód. Pessoa (Pergamum)</label>
+                <input type="text" name="user_registration" class="form-control">
+            </div>
+            <div class="col-md-3">
+                <label>Telefone</label>
+                <input type="text" name="user_phone" class="form-control">
+            </div>
+            <div class="col-md-3">
+                <label>Devolução Prevista</label>
+                <input type="date" name="expected_return_date" class="form-control">
+            </div>
+            <div class="col-md-12">
+                <label>Observações</label>
+                <input type="text" name="notes" class="form-control">
             </div>
         </div>
     </div>
 
-    <!-- Lista de Livros -->
-    <div class="card mb-4 shadow-sm">
-        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-            <span>Livros Emprestados</span>
-            <button type="button" class="btn btn-sm btn-light" onclick="addBookRow()">+ Adicionar Livro</button>
+    <div class="panel mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-3">
+            <h3 class="mb-0 border-0 pb-0">Livros Emprestados</h3>
+            <button type="button" class="btn btn-outline-primary btn-sm" onclick="addBookRow()"><i class="bi bi-plus-lg"></i> Adicionar Livro</button>
         </div>
-        <div class="card-body" id="books-container">
-            <div class="row book-row mb-3 border-bottom pb-3">
-                <div class="col-md-6">
-                    <label>Livro *</label>
-                    <input type="text" name="book_title[]" class="form-control" required>
-                </div>
-                <div class="col-md-3">
-                    <label>C.E. (Cód. Exemplar)</label>
-                    <input type="text" name="copy_code[]" class="form-control">
-                </div>
-                <div class="col-md-3">
-                    <label>OBS (Livro)</label>
-                    <input type="text" name="item_notes[]" class="form-control">
-                </div>
+        <div id="books-container">
+            <div class="row g-3 book-row align-items-end">
+                <div class="col-md-6"><label>Título do Livro *</label><input type="text" name="book_title[]" class="form-control" required></div>
+                <div class="col-md-3"><label>C.E.</label><input type="text" name="copy_code[]" class="form-control"></div>
+                <div class="col-md-3"><label>OBS</label><input type="text" name="item_notes[]" class="form-control"></div>
             </div>
         </div>
     </div>
 
-    <button type="submit" class="btn btn-primary btn-lg">Gravar Empréstimo</button>
+    <div class="text-end mb-5"><button type="submit" class="btn btn-primary btn-lg px-5">Gravar Empréstimo</button></div>
 </form>
 
-<hr class="my-5">
-<h4>Últimos Empréstimos Registrados</h4>
-<div class="table-responsive">
-    <table class="table table-striped table-hover">
-        <thead class="table-dark">
-            <tr>
-                <th>Data</th>
-                <th>Usuário</th>
-                <th>Cód. Pessoa</th>
-                <th>Qtd. Livros</th>
-                <th>Devolução</th>
-                <th>Operador</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for row in rows %}
-            <tr>
-                <td>{{ row.loan_date.strftime('%d/%m/%Y') }}</td>
-                <td><strong>{{ row.user_name }}</strong></td>
-                <td>{{ row.user_registration or '-' }}</td>
-                <td>{{ row.items|length }}</td>
-                <td>{{ row.expected_return_date.strftime('%d/%m/%Y') if row.expected_return_date else '-' }}</td>
-                <td>{{ row.operator.name }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<div class="panel">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3 class="mb-0">Histórico de Empréstimos</h3>
+        <div class="d-flex gap-2">
+            <form method="GET" action="{{ url_for('main.loan_contingency') }}" class="d-flex gap-2">
+                <select name="status" class="form-select form-select-sm" style="width: 150px;">
+                    <option value="">Todos os Status</option>
+                    <option value="Emprestado" {% if status_filter == 'Emprestado' %}selected{% endif %}>Emprestado</option>
+                    <option value="Devolvido" {% if status_filter == 'Devolvido' %}selected{% endif %}>Devolvido</option>
+                </select>
+                <input type="text" name="q" class="form-control form-control-sm" placeholder="Nome ou código..." value="{{ term or '' }}">
+                <button type="submit" class="btn btn-sm btn-outline-secondary"><i class="bi bi-search"></i></button>
+            </form>
+            <a href="{{ url_for('main.loan_contingency_excel') }}" class="btn btn-sm btn-success text-white"><i class="bi bi-file-earmark-excel"></i> Excel</a>
+        </div>
+    </div>
+    <div class="table-responsive mt-3">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Data Empréstimo</th>
+                    <th>Usuário</th>
+                    <th>Livros</th>
+                    <th>Status</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in rows %}
+                <tr>
+                    <td><strong>{{ row.loan_date.strftime('%d/%m/%Y') }}</strong></td>
+                    <td>{{ row.user_name }}<br><small class="text-muted">Cód: {{ row.user_registration or '-' }}</small></td>
+                    <td>{{ row.items|length }}</td>
+                    <td>
+                        {% if row.status == 'Devolvido' %}
+                            <span class="badge bg-success">Devolvido em {{ row.returned_at.strftime('%d/%m') }}</span>
+                        {% elif row.expected_return_date and row.expected_return_date < today %}
+                            <span class="badge bg-danger">Atrasado</span>
+                        {% else %}
+                            <span class="badge bg-warning text-dark">Emprestado</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="d-flex gap-1">
+                            <a href="{{ url_for('main.loan_contingency_detail', id=row.id) }}" class="btn btn-sm btn-outline-primary" title="Detalhes"><i class="bi bi-eye"></i></a>
+                            {% if row.status != 'Devolvido' %}
+                            <form action="{{ url_for('main.loan_contingency_return', id=row.id) }}" method="POST" onsubmit="return confirm('Confirmar devolução?');">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                                <button type="submit" class="btn btn-sm btn-outline-success" title="Registrar Devolução"><i class="bi bi-check-lg"></i> Devolver</button>
+                            </form>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="5" class="text-center text-muted py-4">Nenhum registro.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 {% endblock %}
 
@@ -104,18 +128,8 @@
     function addBookRow() {
         const container = document.getElementById('books-container');
         const newRow = document.createElement('div');
-        newRow.className = 'row book-row mb-3 border-bottom pb-3';
-        newRow.innerHTML = `
-            <div class="col-md-6">
-                <input type="text" name="book_title[]" class="form-control" placeholder="Nome do Livro" required>
-            </div>
-            <div class="col-md-3">
-                <input type="text" name="copy_code[]" class="form-control" placeholder="C.E.">
-            </div>
-            <div class="col-md-3">
-                <input type="text" name="item_notes[]" class="form-control" placeholder="OBS">
-            </div>
-        `;
+        newRow.className = 'row g-3 book-row align-items-end mt-1';
+        newRow.innerHTML = `<div class="col-md-6"><input type="text" name="book_title[]" class="form-control" required></div><div class="col-md-3"><input type="text" name="copy_code[]" class="form-control"></div><div class="col-md-3"><div class="d-flex gap-2"><input type="text" name="item_notes[]" class="form-control"><button type="button" class="btn btn-outline-danger" onclick="this.closest('.book-row').remove()"><i class="bi bi-trash"></i></button></div></div>`;
         container.appendChild(newRow);
     }
 </script>

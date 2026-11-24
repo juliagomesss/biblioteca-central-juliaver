@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block page_title %}Detalhes do Empréstimo{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Detalhes do Empréstimo (Aluno)</h2>
+    <a href="{{ url_for('main.loan_contingency') }}" class="btn btn-outline-secondary">Voltar</a>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="panel">
+            <h3>Dados do Solicitante</h3>
+            <p><strong>Nome:</strong> {{ loan.user_name }}</p>
+            <p><strong>CPF:</strong> {{ loan.user_document or '-' }}</p>
+            <p><strong>Cód. Pessoa:</strong> {{ loan.user_registration or '-' }}</p>
+            <p><strong>Telefone:</strong> {{ loan.user_phone or '-' }}</p>
+            <p><strong>Data do Empréstimo:</strong> {{ loan.loan_date.strftime('%d/%m/%Y') }}</p>
+            <p><strong>Devolução Prevista:</strong> {{ loan.expected_return_date.strftime('%d/%m/%Y') if loan.expected_return_date else '-' }}</p>
+            <p><strong>Observações:</strong> {{ loan.notes or '-' }}</p>
+            <p><strong>Operador:</strong> {{ loan.operator.name }}</p>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="panel">
+            <h3>Livros Emprestados</h3>
+            <ul class="list-group mt-3">
+                {% for item in loan.items %}
+                <li class="list-group-item">
+                    <strong>{{ item.book_title }}</strong><br>
+                    <small>C.E: {{ item.copy_code or '-' }} | OBS: {{ item.item_notes or '-' }}</small>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="panel text-end">
+    <a href="{{ url_for('main.loan_contingency_pdf', id=loan.id) }}" target="_blank" class="btn btn-danger me-2"><i class="bi bi-file-earmark-pdf"></i> Baixar PDF</a>
+    <a href="{{ url_for('main.loan_contingency_edit', id=loan.id) }}" class="btn btn-primary me-2"><i class="bi bi-pencil"></i> Editar</a>
+    <form action="{{ url_for('main.loan_contingency_delete', id=loan.id) }}" method="POST" class="d-inline" onsubmit="return confirm('Tem certeza que deseja excluir este empréstimo? Isso não pode ser desfeito.');">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        <button type="submit" class="btn btn-outline-danger"><i class="bi bi-trash"></i> Excluir</button>
+    </form>
+</div>
+{% endblock %}
