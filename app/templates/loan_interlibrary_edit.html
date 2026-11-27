@@ -9,11 +9,20 @@
     <div class="panel mb-4">
         <h3>Instituição</h3>
         <div class="row g-3">
-            <div class="col-md-6"><label>Biblioteca *</label><input type="text" name="requesting_library" class="form-control" value="{{ loan.requesting_library }}" required></div>
+            <div class="col-md-6"><label>Campus de Origem</label><input type="text" name="campus_origin" class="form-control" value="{{ loan.campus_origin or '' }}" required></div>
+            <div class="col-md-6"><label>Campus de Destino</label><input type="text" name="campus_destination" class="form-control" value="{{ loan.campus_destination or '' }}" required></div>
+            <div class="col-md-6"><label>Biblioteca</label><input type="text" name="requesting_library" class="form-control" value="{{ loan.requesting_library }}" required></div>
             <div class="col-md-6"><label>Endereço</label><input type="text" name="address" class="form-control" value="{{ loan.address or '' }}"></div>
             <div class="col-md-4"><label>Telefone</label><input type="text" name="phone" class="form-control" value="{{ loan.phone or '' }}"></div>
             <div class="col-md-4"><label>Contato</label><input type="text" name="contact_person" class="form-control" value="{{ loan.contact_person or '' }}"></div>
             <div class="col-md-4"><label>E-mail</label><input type="email" name="contact_email" class="form-control" value="{{ loan.contact_email or '' }}"></div>
+            <div class="col-md-4">
+                <label>Já foi passado para o Pergamum?</label>
+                <select name="pergamum_status" class="form-select">
+                    <option value="Pendente" {% if loan.pergamum_status != 'Sim' %}selected{% endif %}>Pendente</option>
+                    <option value="Sim" {% if loan.pergamum_status == 'Sim' %}selected{% endif %}>Sim</option>
+                </select>
+            </div>
         </div>
     </div>
 

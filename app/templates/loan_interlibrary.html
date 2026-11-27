@@ -12,18 +12,33 @@
     <div class="panel mb-4">
         <h3>Dados da Instituição</h3>
         <div class="row g-3">
+            <div class="col-md-6">
+                <label>Campus de Origem</label>
+                <input type="text" name="campus_origin" class="form-control" placeholder="Ex.: Campus São Paulo" required>
+            </div>
+            <div class="col-md-6">
+                <label>Campus de Destino</label>
+                <input type="text" name="campus_destination" class="form-control" placeholder="Ex.: Campus Campinas" required>
+            </div>
             <div class="col-md-4">
-                <label>Data do Empréstimo *</label>
+                <label>Data do Empréstimo</label>
                 <input type="date" name="loan_date" class="form-control" value="{{ today }}" required>
             </div>
             <div class="col-md-8">
-                <label>Nome da Biblioteca *</label>
+                <label>Nome da Biblioteca</label>
                 <input type="text" name="requesting_library" class="form-control" required>
             </div>
             <div class="col-md-6"><label>Endereço</label><input type="text" name="address" class="form-control"></div>
             <div class="col-md-3"><label>Telefone</label><input type="text" name="phone" class="form-control"></div>
             <div class="col-md-3"><label>Contato</label><input type="text" name="contact_person" class="form-control"></div>
             <div class="col-md-12"><label>E-mail</label><input type="email" name="contact_email" class="form-control"></div>
+            <div class="col-md-4">
+                <label>Já foi passado para o Pergamum?</label>
+                <select name="pergamum_status" class="form-select">
+                    <option value="Pendente" selected>Pendente</option>
+                    <option value="Sim">Sim</option>
+                </select>
+            </div>
         </div>
     </div>
     
@@ -58,7 +73,7 @@
                     <option value="Pendente" {% if status_filter == 'Pendente' %}selected{% endif %}>Pendente</option>
                     <option value="Devolvido" {% if status_filter == 'Devolvido' %}selected{% endif %}>Devolvido</option>
                 </select>
-                <input type="text" name="q" class="form-control form-control-sm" placeholder="Biblioteca ou solicitante..." value="{{ term or '' }}">
+                <input type="text" name="q" class="form-control form-control-sm" placeholder="Campus, biblioteca ou solicitante..." value="{{ term or '' }}">
                 <button type="submit" class="btn btn-sm btn-outline-secondary"><i class="bi bi-search"></i></button>
             </form>
             <a href="{{ url_for('main.loan_interlibrary_excel') }}" class="btn btn-sm btn-success text-white"><i class="bi bi-file-earmark-excel"></i> Excel</a>
@@ -69,9 +84,11 @@
             <thead>
                 <tr>
                     <th>Data Empréstimo</th>
+                    <th>Campus (origem → destino)</th>
                     <th>Biblioteca</th>
                     <th>Solicitante</th>
                     <th>Status</th>
+                    <th>Pergamum</th>
                     <th>Ações</th>
                 </tr>
             </thead>
@@ -79,6 +96,7 @@
                 {% for row in rows %}
                 <tr>
                     <td><strong>{{ row.loan_date.strftime('%d/%m/%Y') if row.loan_date else '-' }}</strong></td>
+                    <td>{{ row.campus_origin or '-' }} → {{ row.campus_destination or '-' }}</td>
                     <td>{{ row.requesting_library }}</td>
                     <td>{{ row.student_name or '-' }}</td>
                     <td>
@@ -86,6 +104,13 @@
                             <span class="badge bg-success">Devolvido em {{ row.return_date.strftime('%d/%m/%Y') }}</span>
                         {% elif row.status == 'Emprestado' %}
                             <span class="badge bg-primary">Emprestado</span>
+                        {% else %}
+                            <span class="badge bg-warning text-dark">Pendente</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if row.pergamum_status == 'Sim' %}
+                            <span class="badge bg-success">Sim</span>
                         {% else %}
                             <span class="badge bg-warning text-dark">Pendente</span>
                         {% endif %}
@@ -103,7 +128,7 @@
                     </td>
                 </tr>
                 {% else %}
-                <tr><td colspan="5" class="text-center text-muted py-4">Nenhum registro.</td></tr>
+                <tr><td colspan="7" class="text-center text-muted py-4">Nenhum registro.</td></tr>
                 {% endfor %}
             </tbody>
         </table>

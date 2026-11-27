@@ -3,6 +3,7 @@ from flask import Flask, redirect, url_for, flash
 from flask_login import LoginManager
 from flask_migrate import Migrate
 from flask_wtf.csrf import CSRFProtect
+from sqlalchemy import inspect, text
 from config import Config
 from .extensions import db
 from .models import User
@@ -37,5 +38,21 @@ def create_app(config_class=Config):
     app.context_processor(inject_globals)
     with app.app_context():
         from . import models
-        db.create_all() if app.config.get("AUTO_CREATE_DB", True) else None
+        if app.config.get("AUTO_CREATE_DB", True):
+            db.create_all()
+            # Compatibilidade com bancos já existentes: db.create_all() não adiciona colunas.
+            inspector = inspect(db.engine)
+            if "inter_library_loan" in inspector.get_table_names():
+                existing_columns = {column["name"] for column in inspector.get_columns("inter_library_loan")}
+                new_columns = {
+                    "campus_origin": "VARCHAR(140)",
+                    "campus_destination": "VARCHAR(140)",
+                    "pergamum_status": "VARCHAR(20) NOT NULL DEFAULT 'Pendente'",
+                }
+                with db.engine.begin() as connection:
+                    for column_name, column_type in new_columns.items():
+                        if column_name not in existing_columns:
+                            connection.execute(text(
+                                f"ALTER TABLE inter_library_loan ADD COLUMN {column_name} {column_type}"
+                            ))
     return app

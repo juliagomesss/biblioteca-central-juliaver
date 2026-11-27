@@ -264,6 +264,9 @@ def loan_interlibrary():
         
         loan = InterLibraryLoan(
             loan_date=dt_loan,
+            campus_origin=request.form.get("campus_origin", "").strip(),
+            campus_destination=request.form.get("campus_destination", "").strip(),
+            pergamum_status=request.form.get("pergamum_status", "Pendente"),
             requesting_library=request.form["requesting_library"], address=request.form.get("address"),
             phone=request.form.get("phone"), contact_person=request.form.get("contact_person"), contact_email=request.form.get("contact_email"),
             student_name=request.form.get("student_name"), student_registration=request.form.get("student_registration"),
@@ -280,7 +283,7 @@ def loan_interlibrary():
     
     if term:
         like = f"%{term}%"
-        query = query.filter(or_(InterLibraryLoan.requesting_library.ilike(like), InterLibraryLoan.student_name.ilike(like), InterLibraryLoan.student_registration.ilike(like)))
+        query = query.filter(or_(InterLibraryLoan.requesting_library.ilike(like), InterLibraryLoan.campus_origin.ilike(like), InterLibraryLoan.campus_destination.ilike(like), InterLibraryLoan.student_name.ilike(like), InterLibraryLoan.student_registration.ilike(like)))
     if status_filter:
         query = query.filter(InterLibraryLoan.status == status_filter)
         
@@ -313,6 +316,9 @@ def loan_interlibrary_edit(id):
         if date_str:
             loan.loan_date = datetime.strptime(date_str, "%Y-%m-%d").date()
             
+        loan.campus_origin = request.form.get("campus_origin", "").strip()
+        loan.campus_destination = request.form.get("campus_destination", "").strip()
+        loan.pergamum_status = request.form.get("pergamum_status", "Pendente")
         loan.requesting_library = request.form["requesting_library"]; loan.address = request.form.get("address")
         loan.phone = request.form.get("phone"); loan.contact_person = request.form.get("contact_person")
         loan.contact_email = request.form.get("contact_email"); loan.student_name = request.form.get("student_name")
@@ -362,11 +368,11 @@ def loan_interlibrary_pdf(id):
 @login_required
 def loan_interlibrary_excel():
     wb = Workbook(); ws = wb.active; ws.title = "Inter_Bibliotecas"
-    ws.append(["Data Empréstimo", "Biblioteca", "Solicitante", "Matrícula", "Referência", "Devolvido Em", "Status"])
+    ws.append(["Data Empréstimo", "Campus de Origem", "Campus de Destino", "Biblioteca", "Solicitante", "Matrícula", "Referência", "Devolvido Em", "Status", "Passado para Pergamum"])
     for cell in ws[1]: cell.font = Font(bold=True)
     for loan in InterLibraryLoan.query.order_by(InterLibraryLoan.loan_date.desc()).all():
         dt_dev = loan.return_date.strftime('%d/%m/%Y') if loan.return_date else ""
-        ws.append([loan.loan_date.strftime('%d/%m/%Y') if loan.loan_date else "", loan.requesting_library, loan.student_name, loan.student_registration, loan.book_reference, dt_dev, loan.status])
+        ws.append([loan.loan_date.strftime('%d/%m/%Y') if loan.loan_date else "", loan.campus_origin or "", loan.campus_destination or "", loan.requesting_library, loan.student_name, loan.student_registration, loan.book_reference, dt_dev, loan.status, loan.pergamum_status or "Pendente"])
     out = BytesIO(); wb.save(out); out.seek(0)
     return send_file(out, as_attachment=True, download_name="interbibliotecas.xlsx", mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 

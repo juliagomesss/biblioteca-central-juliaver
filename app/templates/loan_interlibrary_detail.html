@@ -11,7 +11,16 @@
     <div class="col-md-6">
         <div class="panel">
             <h3>Instituição Solicitante</h3>
+            <p><strong>Campus da nossa biblioteca:</strong> {{ loan.campus_origin or '-' }}</p>
+            <p><strong>Outro campus (destino):</strong> {{ loan.campus_destination or '-' }}</p>
             <p><strong>Biblioteca:</strong> {{ loan.requesting_library }}</p>
+            <p><strong>Passado para o Pergamum:</strong>
+                {% if loan.pergamum_status == 'Sim' %}
+                    <span class="badge bg-success">Sim</span>
+                {% else %}
+                    <span class="badge bg-warning text-dark">Pendente</span>
+                {% endif %}
+            </p>
             <p><strong>Endereço:</strong> {{ loan.address or '-' }}</p>
             <p><strong>Telefone:</strong> {{ loan.phone or '-' }}</p>
             <p><strong>Contato:</strong> {{ loan.contact_person or '-' }}</p>

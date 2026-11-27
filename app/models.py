@@ -70,6 +70,9 @@ class InterLibraryLoan(db.Model):
     # NOVO CAMPO
     status = db.Column(db.String(30), default="Pendente", nullable=False) # Pendente, Emprestado, Devolvido
     
+    campus_origin = db.Column(db.String(140))
+    campus_destination = db.Column(db.String(140))
+    pergamum_status = db.Column(db.String(20), nullable=False, default="Pendente") # Sim, Pendente
     requesting_library = db.Column(db.String(140), nullable=False)
     address = db.Column(db.String(255))
     phone = db.Column(db.String(40))
